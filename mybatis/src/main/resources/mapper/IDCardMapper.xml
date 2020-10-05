@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.ray.mybatis.mapper.IDCardMapper">
+<!--    用户表与身份证表(一对一)映射-->
+<!--    type表示被转换的对象-->
+    <resultMap id="IDCardOfUserMap" type="IDCard">
+<!--       id是存放主键的, property是实体类中的属性名,column是对应的是数据库中字段名称-->
+        <id property="cardid" column="cardid"/>
+        <result property="uid" column="uid"/>
+
+<!--   总结:接收到的类型还是IDCard,它查询到的column(数据库字段)值都被装到了property(实体类的属性)中    -->
+        <association property="user" column="user">
+            <id property="id" column="id"/>
+            <result property="name" column="name"/>
+        </association>
+    </resultMap>
+
+<!--    获取用户信息的身份证列表-->
+<!--    id是接口名称,resultMap返回的是<resultMap>里面配置的,说白了与<resultMap>的id保持一致-->
+    <select id="selectIdOfUser" resultMap="IDCardOfUserMap">
+            select * from id_card i, user u where i.uid = u.id
+    </select>
+
+</mapper>

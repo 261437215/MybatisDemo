@@ -1,0 +1,21 @@
+#配置mysql连接
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/study_mybatis?userUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password:
+
+
+
+
+mybatis:
+  #配置xml映射路径
+  mapper-locations: classpath:mapper/*.xml
+  #配置实体类的别名
+  type-aliases-package: com.ray.mybatis.entity
+  configuration:
+    #开启驼峰命名法
+    map-underscore-to-camel-case: true
+
+#debug: true

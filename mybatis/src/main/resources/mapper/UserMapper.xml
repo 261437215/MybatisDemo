@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.ray.mybatis.mapper.UserMapper">
+<!--    新增用户信息    -->
+    <insert id="insert" parameterType="user">--   parameterType是传入数据类型
+            insert into user(name) value (#{name})
+    </insert>
+
+<!--    修改用户信息-->
+    <update id="update" parameterType="user">
+            update user set name=#{name} where id=#{id}
+    </update>
+
+<!--    删除用户-->
+    <delete id="delete">
+        delete from user where id=#{id}
+    </delete>
+
+<!--    根据id获取信息-->
+    <select id="selectById" resultType="user" parameterType="int">--   resultType是返回数据类型
+        select * from user where id=#{id}
+    </select>
+
+<!--    查询所有用户信息-->
+    <select id="list" resultType="user">
+        select * from user
+    </select>
+
+    <!--    当多个表的字段名称一样时,查询需要使用别名,否则查询结果不理想-->
+    <!--   id是唯一标识,type表示被转换的对象-->
+    <resultMap id="phoneMap" type="user">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <!--   collection是存放多条结果的容器,  一对多 ofType:指定集合里面元素的类型,property是实体类的属性名称-->
+        <collection property="phones" ofType="phone" javaType="list">
+            <id property="id" column="pid"/>
+            <result property="name" column="pname"/>
+            <result property="number" column="number"/>
+            <result property="uid" column="uid"/>
+        </collection>
+    </resultMap>
+    <!--    根据id查询用户的所有电话信息,一对多。
+    https://blog.csdn.net/whl8614john/article/details/107767983?utm_medium=distribute.pc_relevant.none-task-blog-title-6&spm=1001.2101.3001.4242-->
+    <!--    parameterType是传入的参数类型-->
+    <select id="selectPhoneById" resultMap="phoneMap" parameterType="int">
+        select u.*, p.id pid, p.name pname, p.number, p.uid from user u, phone p
+        where u.id=p.uid and u.id=#{id}
+    </select>
+
+<!--    抽离userMap-->
+    <resultMap id="userMap" type="user">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+<!--    继承userMap-->
+    <resultMap id="comboMap" type="user" extends="userMap">
+<!--      一对多-->
+        <collection property="userCombos" ofType="userCombo" javaType="list">
+            <result property="price" column="price"/>
+            <result property="uid" column="uid"/>
+            <result property="cid" column="cid"/>
+<!--      一对多-->
+            <collection property="combos" ofType="combo" javaType="list">
+                <id property="id" column="cid"/>
+                <result property="name" column="cname"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!-- 根据id查询用户选择的运营商 -->
+    <select id="selectComboById" parameterType="int" resultMap="comboMap">
+    select u.*, b.price, b.uid, b.cid, c.id cid, c.name cname from user u, user_combo b, combo c
+    where u.id=b.uid and b.cid=c.id and u.id=#{id}
+    </select>
+
+
+
+</mapper>

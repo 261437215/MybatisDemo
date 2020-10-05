@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ray.mybatis.mapper.ComboMapper">
+
+<!--    抽离comboMap-->
+    <resultMap id="comboMap" type="combo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+<!--    继承comboMap-->
+    <resultMap id="userMap" type="combo" extends="comboMap">
+
+        <collection property="userCombos" ofType="userCombo">
+            <result property="price" column="price"/>
+
+            <collection property="users" ofType="user">
+                <id property="id" column="uid"/>
+                <result property="name" column="uname"/>
+
+                <collection property="phones" ofType="phone">
+                    <id property="id" column="pid"/>
+                    <result property="name" column="pname"/>
+                    <result property="number" column="number"/>
+                </collection>
+
+            </collection>
+        </collection>
+    </resultMap>
+
+<!--    根据id查询运营商拥有的用户和电话信息-->
+    <select id="selectUserById" parameterType="int" resultMap="userMap">
+        select c.*, s.price, u.id uid, u.name uname, p.id pid, p.name pname, p.number from
+        combo c, user_combo s , user u , phone p
+        where c.id=s.cid and s.uid=u.id and u.id=p.uid and c.id=#{id}
+    </select>
+
+</mapper>
